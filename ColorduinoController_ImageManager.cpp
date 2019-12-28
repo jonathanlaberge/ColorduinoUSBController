@@ -57,7 +57,7 @@ void ColorduinoController::StaticText(uint16_t Time, uint16_t Speed, char* Text,
 	}
 }
 
-void ColorduinoController::StaticText3x5(char* Text, byte startingScreen, byte x, byte y, byte Red, byte Green, byte Blue)
+void ColorduinoController::StaticText3x5(char* Text, byte StartingScreen, byte x, byte y, byte Red, byte Green, byte Blue)
 {
 	if (!(x != 0 && x != 4))
 		x = 0;
@@ -67,9 +67,9 @@ void ColorduinoController::StaticText3x5(char* Text, byte startingScreen, byte x
 
 		if (isDigit(Text[i]))
 		{
-			DrawNumber3x5Char(Text[i], startingScreen, x, y, Red, Green, Blue);
+			DrawNumber3x5Char(Text[i], StartingScreen, x, y, Red, Green, Blue);
 			if (x == 4)
-				startingScreen++;
+				StartingScreen++;
 
 			if (x == 0)
 				x = 4;
@@ -78,9 +78,9 @@ void ColorduinoController::StaticText3x5(char* Text, byte startingScreen, byte x
 		}
 		else if (Text[i] == '.' || Text[i] == 'k' || Text[i] == 'm' || Text[i] == 'b' || Text[i] == 'd' || Text[i] == 'f' || Text[i] == 'c')
 		{
-			DrawUnit3x5(Text[i], startingScreen, x, y, Red, Green, Blue);
+			DrawUnit3x5(Text[i], StartingScreen, x, y, Red, Green, Blue);
 			if (x == 4)
-				startingScreen++;
+				StartingScreen++;
 
 			if (x == 0)
 				x = 4;
@@ -147,16 +147,7 @@ void ColorduinoController::PlasmaAll(uint16_t Time, uint16_t Speed)
 	long paletteShift;
 	paletteShift = 128000;
 	unsigned char bcolor;
-	//generate the plasma once
-	//for (unsigned char y = 0; y < SCREENSIZEY; y++)
-	//{
-	//	for (unsigned char x = 0; x < SCREENSIZEX; x++)
-	//	{
-	//		//the plasma buffer is a sum of sines
-	//		bcolor = (unsigned char)(128.0 + (128.0 * sin(x*8.0 / 16.0)) + 128.0 + (128.0 * sin(y*8.0 / 16.0))) / 2;
-	//		plasma[x][y] = bcolor;
-	//	}
-	//}
+
 	for (Time < 0; Time--;)
 	{
 		unsigned char x, y;
@@ -204,6 +195,148 @@ void ColorduinoController::PlasmaAll(uint16_t Time, uint16_t Speed)
 			for (x = 0; x < SCREENSIZEX; x++)
 			{
 				value = sin(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + sin(Dist(x, y, 64.0, 64.0) / 8.0) + sin(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + sin(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(3, x, y - 24, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		paletteShift++;
+		SendToClient(DestI2CAddress1, 0);
+		SendToClient(DestI2CAddress2, 1);
+		SendToClient(DestI2CAddress3, 2);
+		SendToClient(DestI2CAddress4, 3);
+		if (HaveToExitEvent == true) break;
+		delay(Speed);
+	}
+}
+
+void ColorduinoController::PlasmaAllCos(uint16_t Time, uint16_t Speed)
+{
+	unsigned char plasma[SCREENSIZEX][SCREENSIZEY];
+	long paletteShift;
+	paletteShift = 128000;
+	unsigned char bcolor;
+
+	for (Time < 0; Time--;)
+	{
+		unsigned char x, y;
+		float value;
+		ColorRGB colorRGB;
+		ColorHSV colorHSV;
+		for (y = 0; y < SCREENSIZEY; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = cos(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + cos(Dist(x, y, 64.0, 64.0) / 8.0) + cos(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + cos(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(0, x, y, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		for (y = 8; y < SCREENSIZEY + 8; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = cos(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + cos(Dist(x, y, 64.0, 64.0) / 8.0) + cos(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + cos(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(1, x, y - 8, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		for (y = 16; y < SCREENSIZEY + 16; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = cos(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + cos(Dist(x, y, 64.0, 64.0) / 8.0) + cos(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + cos(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(2, x, y - 16, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		for (y = 24; y < SCREENSIZEY + 24; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = cos(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + cos(Dist(x, y, 64.0, 64.0) / 8.0) + cos(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + cos(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(3, x, y - 24, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		paletteShift++;
+		SendToClient(DestI2CAddress1, 0);
+		SendToClient(DestI2CAddress2, 1);
+		SendToClient(DestI2CAddress3, 2);
+		SendToClient(DestI2CAddress4, 3);
+		if (HaveToExitEvent == true) break;
+		delay(Speed);
+	}
+}
+
+void ColorduinoController::PlasmaAllTan(uint16_t Time, uint16_t Speed)
+{
+	unsigned char plasma[SCREENSIZEX][SCREENSIZEY];
+	long paletteShift;
+	paletteShift = 128000;
+	unsigned char bcolor;
+
+	for (Time < 0; Time--;)
+	{
+		unsigned char x, y;
+		float value;
+		ColorRGB colorRGB;
+		ColorHSV colorHSV;
+		for (y = 0; y < SCREENSIZEY; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = tan(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + tan(Dist(x, y, 64.0, 64.0) / 8.0) + tan(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + tan(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(0, x, y, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		for (y = 8; y < SCREENSIZEY + 8; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = tan(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + tan(Dist(x, y, 64.0, 64.0) / 8.0) + tan(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + tan(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(1, x, y - 8, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		for (y = 16; y < SCREENSIZEY + 16; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = tan(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + tan(Dist(x, y, 64.0, 64.0) / 8.0) + tan(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + tan(Dist(x, y, 192.0, 100.0) / 8.0);
+				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
+				colorHSV.s = 255;
+				colorHSV.v = 255;
+				HSVtoRGB(&colorRGB, &colorHSV);
+				SetPixel(2, x, y - 16, colorRGB.r, colorRGB.g, colorRGB.b);
+			}
+		}
+		for (y = 24; y < SCREENSIZEY + 24; y++)
+		{
+			for (x = 0; x < SCREENSIZEX; x++)
+			{
+				value = tan(Dist(x + paletteShift, y, 128.0, 128.0) / 8.0) + tan(Dist(x, y, 64.0, 64.0) / 8.0) + tan(Dist(x, y + paletteShift / 7, 192.0, 64) / 7.0) + tan(Dist(x, y, 192.0, 100.0) / 8.0);
 				colorHSV.h = (unsigned char)((value) * 128) & 0xff;
 				colorHSV.s = 255;
 				colorHSV.v = 255;

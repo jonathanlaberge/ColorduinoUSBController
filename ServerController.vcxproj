@@ -144,6 +144,7 @@
     <ClCompile Include="EEPROMSaver.cpp" />
     <ClCompile Include="Language.c" />
     <ClCompile Include="MemoryFree.cpp" />
+    <ClCompile Include="Mode.c" />
     <ClCompile Include="NumberFormat.cpp" />
     <ClCompile Include="PixelChar.c">
       <FileType>CppCode</FileType>
