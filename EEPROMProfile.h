@@ -4,10 +4,12 @@
 class EEPROMProfile
 {
 public:
-	bool Setted_IsMuted = false;
-	bool IsMuted = false;
 	bool Setted_PlayMode = false;
 	Mode PlayMode = Mode::FreeMode;
+	bool Setted_IsMuted = false;
+	bool IsMuted = false;
+	bool Setted_WaitForConsole = false;
+	bool WaitForConsole = false;
 
 
 };

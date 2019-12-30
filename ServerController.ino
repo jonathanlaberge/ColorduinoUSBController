@@ -8,7 +8,6 @@ void setup()
 	Serial.begin(Config_Serial_Speed);
 	Serial.println(F("<< Setup"));
 	ColorduinoController::Instance()->Setup();
-	/*wdt_enable(Config_WatchDog_Timeout);*/
 	ColorduinoController::Instance()->Buzzer->BuzzerBeep(1000);
 }
 

@@ -34,10 +34,15 @@ void ColorduinoController::StaticText(uint16_t Time, uint16_t Speed, char* Text,
 	for (Time < 0; Time--;)
 	{
 		if (HaveToExitEvent == true) break;
-		FillPixel(0, BackgroundRed, BackgroundGreen, BackgroundBlue);
-		FillPixel(1, BackgroundRed, BackgroundGreen, BackgroundBlue);
-		FillPixel(2, BackgroundRed, BackgroundGreen, BackgroundBlue);
-		FillPixel(3, BackgroundRed, BackgroundGreen, BackgroundBlue);
+
+		if (BackgroundRed || BackgroundGreen || BackgroundBlue)
+		{
+			FillPixel(0, BackgroundRed, BackgroundGreen, BackgroundBlue);
+			FillPixel(1, BackgroundRed, BackgroundGreen, BackgroundBlue);
+			FillPixel(2, BackgroundRed, BackgroundGreen, BackgroundBlue);
+			FillPixel(3, BackgroundRed, BackgroundGreen, BackgroundBlue);
+		}
+
 		for (int i = 0; i < strlen(Text); i++)
 		{
 			if (HaveToExitEvent == true) break;

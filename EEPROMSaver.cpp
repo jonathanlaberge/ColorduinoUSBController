@@ -19,12 +19,26 @@ EEPROMProfile EEPROMSaver::CheckEEPROMProfile()
 				EEPROM.get(3, EEPROMbyte);
 				Serial.print(F("<< Setup: Config: PlayMode = "));
 				Serial.println(EEPROMbyte);
-				profile.PlayMode = EEPROMbyte;
+				profile.PlayMode = static_cast<Mode>(EEPROMbyte);
+				profile.Setted_PlayMode = true;
 
 				EEPROM.get(4, EEPROMbyte);
 				Serial.print(F("<< Setup: Config: IsMuted = "));
 				Serial.println(EEPROMbyte);
 				profile.IsMuted = EEPROMbyte;
+				profile.Setted_IsMuted = true;
+
+				EEPROM.get(5, EEPROMbyte);
+				Serial.print(F("<< Setup: Config: WaitForConsole = "));
+				Serial.println(EEPROMbyte);
+				profile.WaitForConsole = EEPROMbyte;
+				profile.Setted_WaitForConsole = true;
+				if (profile.WaitForConsole && profile.PlayMode != Mode::FreeMode)
+				{
+					Serial.println(F("<<! Setup: Config: PlayMode must be set to Mode::FreeMode"));
+					profile.PlayMode = Mode::FreeMode;
+				}
+
 			}
 		}
 	}
@@ -46,8 +60,14 @@ void EEPROMSaver::SaveEEPROMProfile(EEPROMProfile profile)
 	}
 	if (profile.Setted_IsMuted)
 	{
-		EEPROM.update( 4, profile.IsMuted);
+		EEPROM.update(4, profile.IsMuted);
 		Serial.print(F("<< Setup: Config: IsMuted = "));
 		Serial.println(profile.IsMuted);
+	}
+	if (profile.Setted_WaitForConsole)
+	{
+		EEPROM.update(5, profile.WaitForConsole);
+		Serial.print(F("<< Setup: Config: WaitForConsole = "));
+		Serial.println(profile.WaitForConsole);
 	}
 }
