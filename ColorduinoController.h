@@ -69,10 +69,12 @@ public:
 	void StaticText(uint16_t Time, uint16_t Speed, char* Text, byte Red, byte Green, byte Blue, byte BackgroundRed, byte BackgroundGreen, byte BackgroundBlue);
 	void StaticText3x5(char * Text, byte StartingScreen, byte x, byte y, byte Red, byte Green, byte Blue);
 	void ScrollText(uint16_t Time, uint16_t Speed, char* Text, byte Red, byte Green, byte Blue, byte BackgroundRed, byte BackgroundGreen, byte BackgroundBlue);
+	bool SendToAllClient();
 	void SendToClient(byte AddressI2C, byte AddressColor);
 	void SetConsoleEcho(bool echo);
 	bool HaveToExitEvent;
 	bool WaitForConsole;
+	bool WaitForSending;
 	Mode PlayMode;
 	BuzzerController *Buzzer;
 private:
@@ -85,7 +87,7 @@ private:
 	static ColorduinoController* instance;
 	byte DisplayByte[4][3][64]; //Display array - 64 bytes x 3 colours
 	char languageString[64];
-	CmdCallback_P<12> cmdCallback;
+	CmdCallback_P<13> cmdCallback;
 	CmdBuffer<128> cmdBuffer;
 	CmdParser cmdParser;
 };

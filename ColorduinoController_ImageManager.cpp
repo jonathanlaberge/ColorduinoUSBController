@@ -20,11 +20,9 @@ void ColorduinoController::ScrollText(uint16_t Time, uint16_t Speed, char* Text,
 				DrawChar(1, -XMove + (Char * 6) + 26, 0, Text[Char], Red, Green, Blue);
 				DrawChar(0, -XMove + (Char * 6) + 34, 0, Text[Char], Red, Green, Blue);
 			}
-			SendToClient(DestI2CAddress1, 0);
-			SendToClient(DestI2CAddress2, 1);
-			SendToClient(DestI2CAddress3, 2);
-			SendToClient(DestI2CAddress4, 3);
-			delay(Speed);
+
+			if (SendToAllClient())
+				delay(Speed);
 		}
 	}
 }
@@ -51,14 +49,9 @@ void ColorduinoController::StaticText(uint16_t Time, uint16_t Speed, char* Text,
 			DrawChar(2, i * 6 - 16, 0, Text[i], Red, Green, Blue);
 			DrawChar(3, i * 6 - 24, 0, Text[i], Red, Green, Blue);
 		}
-		if (Speed != 0)
-		{
-			SendToClient(DestI2CAddress1, 0);
-			SendToClient(DestI2CAddress2, 1);
-			SendToClient(DestI2CAddress3, 2);
-			SendToClient(DestI2CAddress4, 3);
+
+		if (SendToAllClient())
 			delay(Speed);
-		}
 	}
 }
 
@@ -93,10 +86,7 @@ void ColorduinoController::StaticText3x5(char* Text, byte StartingScreen, byte x
 				x = 0;
 		}
 	}
-	SendToClient(DestI2CAddress1, 0);
-	SendToClient(DestI2CAddress2, 1);
-	SendToClient(DestI2CAddress3, 2);
-	SendToClient(DestI2CAddress4, 3);
+	SendToAllClient();
 }
 
 void ColorduinoController::PlasmaSolo(uint16_t Time, uint16_t Speed)
@@ -137,12 +127,11 @@ void ColorduinoController::PlasmaSolo(uint16_t Time, uint16_t Speed)
 			}
 		}
 		paletteShift++;
-		SendToClient(DestI2CAddress1, 0);
-		SendToClient(DestI2CAddress2, 1);
-		SendToClient(DestI2CAddress3, 2);
-		SendToClient(DestI2CAddress4, 3);
+
+		if (SendToAllClient())
+			delay(Speed);
+
 		if (HaveToExitEvent == true) break;
-		delay(Speed);
 	}
 }
 
@@ -208,12 +197,11 @@ void ColorduinoController::PlasmaAll(uint16_t Time, uint16_t Speed)
 			}
 		}
 		paletteShift++;
-		SendToClient(DestI2CAddress1, 0);
-		SendToClient(DestI2CAddress2, 1);
-		SendToClient(DestI2CAddress3, 2);
-		SendToClient(DestI2CAddress4, 3);
+
+		if (SendToAllClient())
+			delay(Speed);
+
 		if (HaveToExitEvent == true) break;
-		delay(Speed);
 	}
 }
 
@@ -279,12 +267,11 @@ void ColorduinoController::PlasmaAllCos(uint16_t Time, uint16_t Speed)
 			}
 		}
 		paletteShift++;
-		SendToClient(DestI2CAddress1, 0);
-		SendToClient(DestI2CAddress2, 1);
-		SendToClient(DestI2CAddress3, 2);
-		SendToClient(DestI2CAddress4, 3);
+
+		if (SendToAllClient())
+			delay(Speed);
+
 		if (HaveToExitEvent == true) break;
-		delay(Speed);
 	}
 }
 
@@ -350,12 +337,11 @@ void ColorduinoController::PlasmaAllTan(uint16_t Time, uint16_t Speed)
 			}
 		}
 		paletteShift++;
-		SendToClient(DestI2CAddress1, 0);
-		SendToClient(DestI2CAddress2, 1);
-		SendToClient(DestI2CAddress3, 2);
-		SendToClient(DestI2CAddress4, 3);
+
+		if (SendToAllClient())
+			delay(Speed);
+
 		if (HaveToExitEvent == true) break;
-		delay(Speed);
 	}
 }
 
@@ -379,10 +365,7 @@ void ColorduinoController::ColorFader(uint16_t Time)
 		FillPixel(1, Red, Green, Blue);
 		FillPixel(2, Red, Green, Blue);
 		FillPixel(3, Red, Green, Blue);
-		SendToClient(DestI2CAddress1, 0);
-		SendToClient(DestI2CAddress2, 1);
-		SendToClient(DestI2CAddress3, 2);
-		SendToClient(DestI2CAddress4, 3);
+		SendToAllClient();
 		if (HaveToExitEvent == true) break;
 	}
 }
@@ -395,10 +378,7 @@ void ColorduinoController::FullColor(uint16_t Time, byte Red, byte Green, byte B
 		FillPixel(1, Red, Green, Blue);
 		FillPixel(2, Red, Green, Blue);
 		FillPixel(3, Red, Green, Blue);
-		SendToClient(DestI2CAddress1, 0);
-		SendToClient(DestI2CAddress2, 1);
-		SendToClient(DestI2CAddress3, 2);
-		SendToClient(DestI2CAddress4, 3);
+		SendToAllClient();
 		if (HaveToExitEvent == true) break;
 	}
 }
@@ -434,5 +414,6 @@ void ColorduinoController::Loading(byte Screen, uint16_t Time)
 	CleanUpPixel(1);
 	CleanUpPixel(2);
 	CleanUpPixel(3);
-	SendToClient(ScreenDest, Screen);
+
+	SendToAllClient();
 }

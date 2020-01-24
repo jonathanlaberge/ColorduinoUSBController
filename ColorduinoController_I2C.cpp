@@ -1,5 +1,19 @@
 #include "ColorduinoController.h"
 
+bool ColorduinoController::SendToAllClient()
+{
+	if (!WaitForSending)
+	{
+		SendToClient(DestI2CAddress1, 0);
+		SendToClient(DestI2CAddress2, 1);
+		SendToClient(DestI2CAddress3, 2);
+		SendToClient(DestI2CAddress4, 3);
+		return true;
+	}
+
+	CheckRoutine();
+	return false;
+}
 
 void ColorduinoController::SendToClient(byte AddressI2C, byte AddressColor)
 {

@@ -277,9 +277,21 @@ void ColorduinoController_CMDIcon(CmdParser* parser)
 	{
 		ColorduinoController::Instance()->DrawImage8x8(ScreenAddress, x, y, ImageAverageTemperature);
 	}
-	else if(parser->equalCmdParam_P(4, PSTR("LOWTEMPERATURE")))
+	else if (parser->equalCmdParam_P(4, PSTR("LOWTEMPERATURE")))
 	{
 		ColorduinoController::Instance()->DrawImage8x8(ScreenAddress, x, y, ImageLowTemperature);
+	}
+	else if (parser->equalCmdParam_P(4, PSTR("CPU")))
+	{
+		ColorduinoController::Instance()->DrawImage8x8(ScreenAddress, x, y, ImageCPU);
+	}
+	else if (parser->equalCmdParam_P(4, PSTR("RAM")))
+	{
+		ColorduinoController::Instance()->DrawImage8x8(ScreenAddress, x, y, ImageRAM);
+	}
+	else if (parser->equalCmdParam_P(4, PSTR("MAIL")))
+	{
+		ColorduinoController::Instance()->DrawImage8x8(ScreenAddress, x, y, ImageMail);
 	}
 	else
 	{
@@ -324,22 +336,22 @@ void ColorduinoController_CMDPixel(CmdParser* parser)
 void ColorduinoController_CMDClear(CmdParser* parser)
 {
 	ColorduinoController::Instance()->Buzzer->BuzzerBeep(atoi(parser->getCmdParam(1)));
-	if (parser->equalCmdParam_P(1, PSTR("0")))
+	if (parser->equalCmdParam_P(1, PSTR("1")) || parser->equalCmdParam_P(2, PSTR("1")) || parser->equalCmdParam_P(3, PSTR("1")))
 	{
 		Serial.println(F("<< CMDClear: Clearing screen 0"));
 		ColorduinoController::Instance()->CleanUpPixel(0);
 	}
-	else if (parser->equalCmdParam_P(1, PSTR("1")))
+	else if (parser->equalCmdParam_P(1, PSTR("2")) || parser->equalCmdParam_P(2, PSTR("2")) || parser->equalCmdParam_P(3, PSTR("2")))
 	{
 		Serial.println(F("<< CMDClear: Clearing screen 1"));
 		ColorduinoController::Instance()->CleanUpPixel(1);
 	}
-	else if (parser->equalCmdParam_P(1, PSTR("2")))
+	else if (parser->equalCmdParam_P(1, PSTR("3")) || parser->equalCmdParam_P(2, PSTR("3")) || parser->equalCmdParam_P(3, PSTR("3")))
 	{
 		Serial.println(F("<< CMDClear: Clearing screen 2"));
 		ColorduinoController::Instance()->CleanUpPixel(2);
 	}
-	else if (parser->equalCmdParam_P(1, PSTR("3")))
+	else if (parser->equalCmdParam_P(1, PSTR("4")) || parser->equalCmdParam_P(2, PSTR("4")) || parser->equalCmdParam_P(3, PSTR("4")))
 	{
 		Serial.println(F("<< CMDClear: Clearing screen 3"));
 		ColorduinoController::Instance()->CleanUpPixel(3);
@@ -351,6 +363,39 @@ void ColorduinoController_CMDClear(CmdParser* parser)
 		ColorduinoController::Instance()->CleanUpPixel(1);
 		ColorduinoController::Instance()->CleanUpPixel(2);
 		ColorduinoController::Instance()->CleanUpPixel(3);
+	}
+}
+
+void ColorduinoController_CMDSend(CmdParser* parser)
+{
+	ColorduinoController::Instance()->Buzzer->BuzzerBeep(atoi(parser->getCmdParam(1)));
+	if (parser->equalCmdParam_P(1, PSTR("1")) || parser->equalCmdParam_P(2, PSTR("1")) || parser->equalCmdParam_P(3, PSTR("1")))
+	{
+		Serial.println(F("<< CMDClear: Sending screen 0"));
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress1, 0);
+	}
+	else if (parser->equalCmdParam_P(1, PSTR("2")) || parser->equalCmdParam_P(2, PSTR("2")) || parser->equalCmdParam_P(3, PSTR("2")))
+	{
+		Serial.println(F("<< CMDClear: Sending screen 1"));
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress2, 1);
+	}
+	else if (parser->equalCmdParam_P(1, PSTR("3")) || parser->equalCmdParam_P(2, PSTR("3")) || parser->equalCmdParam_P(3, PSTR("3")))
+	{
+		Serial.println(F("<< CMDClear: Sending screen 2"));
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress3, 2);
+	}
+	else if (parser->equalCmdParam_P(1, PSTR("4")) || parser->equalCmdParam_P(2, PSTR("4")) || parser->equalCmdParam_P(3, PSTR("4")))
+	{
+		Serial.println(F("<< CMDClear: Sending screen 3"));
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress4, 3);
+	}
+	else
+	{
+		Serial.println(F("<< CMDClear: Sending all screen"));
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress1, 0);
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress2, 1);
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress3, 2);
+		ColorduinoController::Instance()->SendToClient(DestI2CAddress4, 3);
 	}
 }
 
@@ -404,6 +449,19 @@ void ColorduinoController_CMDSetting(CmdParser* parser)
 			ColorduinoController::Instance()->WaitForConsole = false;
 		}
 	}
+	else if (parser->equalCmdParam_P(1, PSTR("WAITFORSENDING")))
+	{
+		if (parser->equalCmdParam_P(2, PSTR("TRUE")))
+		{
+			Serial.println(F("<< CMDSetting: WaitForSending set to true"));
+			ColorduinoController::Instance()->WaitForSending = true;
+		}
+		else
+		{
+			Serial.println(F("<< CMDSetting: WaitForSending set to false"));
+			ColorduinoController::Instance()->WaitForSending = false;
+		}
+	}
 	else if (parser->equalCmdParam_P(1, PSTR("ECHOCONSOLE")))
 	{
 		if (parser->equalCmdParam_P(2, PSTR("FALSE")))
@@ -433,18 +491,19 @@ void ColorduinoController_CMDMemFree(CmdParser* parser)
 void ColorduinoController_CMDHelp(CmdParser* parser)
 {
 	Serial.println(F("<< CMDHelp: {Needed Args:Format} [Optional Args:Format] (Possible Action) (<Default Action>)"));
+	Serial.println(F("<< CMDHelp:		Note: ScreenAddress start at 0 and end at 3. ScreenAddressAtOne start to 1 and end at 4."));
 	//Serial.println(F("<< CMDHelp: PLAYMODE [Mode:byte]"));
 	Serial.println(F("<< CMDHelp: PLAYMODE (FREEMODE, PLASMA (<SIN>, COS, TAN), FADE, LOADING, SOLIDCOLOR (RED, GREEN, BLUE, YELLOW, PURPLE, CYAN, <WHITE>, AZUR, ORANGE)"));
 	Serial.println(F("<< CMDHelp: SAVE (READ)"));
-	Serial.println(F("<< CMDHelp: BEEP {Frequency:uint}"));
-	Serial.println(F("<< CMDHelp: BEEP (MUTE, UNMUTE, CRITICAL {Time:uint})"));
+	Serial.println(F("<< CMDHelp: BEEP ({Frequency:uint}, MUTE, UNMUTE, CRITICAL {Time:uint})"));
 	Serial.println(F("<< CMDHelp: STATICTEXT {Time:uint} {Speed:uint} {Text:char} {Red:byte} {Green:byte} {Blue:byte} [BackgroundRed:byte] [BackgroundGreen:byte] [BackgroundBlue:byte]"));
 	Serial.println(F("<< CMDHelp: STATICTEXT3X5 {Text:char} {StartingScreen:byte} {x:byte} {y:byte} {Red:byte} {Green:byte} {Blue:byte}"));
 	Serial.println(F("<< CMDHelp: TEXT {Time:uint} {Speed:uint} {Text:char} {Red:byte} {Green:byte} {Blue:byte} [BackgroundRed:byte] [BackgroundGreen:byte] [BackgroundBlue:byte]"));
 	Serial.println(F("<< CMDHelp: ICON {ScreenAddress:byte} {x:byte} {y:byte} {Icon:enum}"));
 	Serial.println(F("<< CMDHelp: PIXEL {ScreenAddress:byte} {x:byte} {y:byte} {w:byte} {h:byte} {Red:byte} {Green:byte} {Blue:byte}"));
-	Serial.println(F("<< CMDHelp: CLEAR [ScreenAddress:byte]"));
-	Serial.println(F("<< CMDHelp: SETTING (WAITFORCONSOLE (TRUE, <FALSE>), ECHOCONSOLE (<TRUE>, FALSE), WATCHDOG (1, 2, 4, 8, <DISABLED>))"));
+	Serial.println(F("<< CMDHelp: CLEAR ([ScreenAddressAtOne:byte], [ScreenAddressAtOne:byte] [ScreenAddressAtOne:byte], [ScreenAddressAtOne:byte] [ScreenAddressAtOne:byte] [ScreenAddressAtOne:byte], ALL)"));
+	Serial.println(F("<< CMDHelp: SEND ([ScreenAddressAtOne:byte], [ScreenAddressAtOne:byte] [ScreenAddressAtOne:byte], [ScreenAddressAtOne:byte] [ScreenAddressAtOne:byte] [ScreenAddressAtOne:byte], ALL)"));
+	Serial.println(F("<< CMDHelp: SETTING (WAITFORCONSOLE (TRUE, <FALSE>), WAITFORSENDING (TRUE, <FALSE>), ECHOCONSOLE (<TRUE>, FALSE), WATCHDOG (1, 2, 4, 8, <DISABLED>))"));
 	Serial.println(F("<< CMDHelp: MEMFREE"));
 }
 
@@ -455,6 +514,9 @@ void ColorduinoController_CMDHelp(CmdParser* parser)
 ColorduinoController::ColorduinoController()
 {
 	Buzzer = new BuzzerController();
+	HaveToExitEvent = false;
+	WaitForConsole = false;
+	WaitForSending = false;
 }
 
 ColorduinoController* ColorduinoController::instance = 0;
@@ -493,6 +555,7 @@ void ColorduinoController::Setup()
 	cmdCallback.addCmd(PSTR("ICON"), &ColorduinoController_CMDIcon);
 	cmdCallback.addCmd(PSTR("PIXEL"), &ColorduinoController_CMDPixel);
 	cmdCallback.addCmd(PSTR("CLEAR"), &ColorduinoController_CMDClear);
+	cmdCallback.addCmd(PSTR("SEND"), &ColorduinoController_CMDSend);
 	cmdCallback.addCmd(PSTR("SETTING"), &ColorduinoController_CMDSetting);
 	cmdCallback.addCmd(PSTR("MEMFREE"), &ColorduinoController_CMDMemFree);
 	cmdCallback.addCmd(PSTR("HELP"), &ColorduinoController_CMDHelp);
@@ -566,11 +629,7 @@ void ColorduinoController::Loop()
 		while (!HaveToExitEvent)
 		{
 			FullCheckRoutine();
-			
-			SendToClient(DestI2CAddress1, 0);
-			SendToClient(DestI2CAddress2, 1);
-			SendToClient(DestI2CAddress3, 2);
-			SendToClient(DestI2CAddress4, 3);
+			SendToAllClient();
 		}
 		break;
 	}
@@ -579,11 +638,8 @@ void ColorduinoController::Loop()
 	CleanUpPixel(1);
 	CleanUpPixel(2);
 	CleanUpPixel(3);
-		
-	SendToClient(DestI2CAddress1, 0);
-	SendToClient(DestI2CAddress2, 1);
-	SendToClient(DestI2CAddress3, 2);
-	SendToClient(DestI2CAddress4, 3);
+
+	SendToAllClient();
 }
 
 void ColorduinoController::SetLanguageString(byte index)
