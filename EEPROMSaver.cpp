@@ -39,6 +39,12 @@ EEPROMProfile EEPROMSaver::CheckEEPROMProfile()
 					profile.PlayMode = Mode::FreeMode;
 				}
 
+				EEPROM.get(6, EEPROMbyte);
+				Serial.print(F("<< Setup: Config: WaitForSending = "));
+				Serial.println(EEPROMbyte);
+				profile.WaitForSending = EEPROMbyte;
+				profile.Setted_WaitForSending = true;
+
 			}
 		}
 	}
@@ -69,5 +75,11 @@ void EEPROMSaver::SaveEEPROMProfile(EEPROMProfile profile)
 		EEPROM.update(5, profile.WaitForConsole);
 		Serial.print(F("<< Setup: Config: WaitForConsole = "));
 		Serial.println(profile.WaitForConsole);
+	}
+	if (profile.Setted_WaitForSending)
+	{
+		EEPROM.update(6, profile.WaitForSending);
+		Serial.print(F("<< Setup: Config: WaitForSending = "));
+		Serial.println(profile.WaitForSending);
 	}
 }

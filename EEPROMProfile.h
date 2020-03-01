@@ -10,6 +10,8 @@ public:
 	bool IsMuted = false;
 	bool Setted_WaitForConsole = false;
 	bool WaitForConsole = false;
+	bool Setted_WaitForSending = false;
+	bool WaitForSending = false;
 
 
 };

@@ -126,6 +126,9 @@ void ColorduinoController_CMDSave(CmdParser* parser)
 		profile.Setted_WaitForConsole = true;
 		profile.WaitForConsole = ColorduinoController::Instance()->WaitForConsole;
 
+		profile.Setted_WaitForSending = true;
+		profile.WaitForSending = ColorduinoController::Instance()->WaitForSending;
+
 		eepromSaver.SaveEEPROMProfile(profile);
 		Serial.println(F("<< CMDSave: Saved"));
 	}
@@ -368,30 +371,35 @@ void ColorduinoController_CMDClear(CmdParser* parser)
 
 void ColorduinoController_CMDSend(CmdParser* parser)
 {
+	bool sent = false;
 	ColorduinoController::Instance()->Buzzer->BuzzerBeep(atoi(parser->getCmdParam(1)));
 	if (parser->equalCmdParam_P(1, PSTR("1")) || parser->equalCmdParam_P(2, PSTR("1")) || parser->equalCmdParam_P(3, PSTR("1")))
 	{
-		Serial.println(F("<< CMDClear: Sending screen 0"));
+		sent = true;
+		Serial.println(F("<< CMDSend: Sending screen 0"));
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress1, 0);
 	}
-	else if (parser->equalCmdParam_P(1, PSTR("2")) || parser->equalCmdParam_P(2, PSTR("2")) || parser->equalCmdParam_P(3, PSTR("2")))
+	if (parser->equalCmdParam_P(1, PSTR("2")) || parser->equalCmdParam_P(2, PSTR("2")) || parser->equalCmdParam_P(3, PSTR("2")))
 	{
-		Serial.println(F("<< CMDClear: Sending screen 1"));
+		sent = true;
+		Serial.println(F("<< CMDSend: Sending screen 1"));
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress2, 1);
 	}
-	else if (parser->equalCmdParam_P(1, PSTR("3")) || parser->equalCmdParam_P(2, PSTR("3")) || parser->equalCmdParam_P(3, PSTR("3")))
+	if (parser->equalCmdParam_P(1, PSTR("3")) || parser->equalCmdParam_P(2, PSTR("3")) || parser->equalCmdParam_P(3, PSTR("3")))
 	{
-		Serial.println(F("<< CMDClear: Sending screen 2"));
+		sent = true;
+		Serial.println(F("<< CMDSend: Sending screen 2"));
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress3, 2);
 	}
-	else if (parser->equalCmdParam_P(1, PSTR("4")) || parser->equalCmdParam_P(2, PSTR("4")) || parser->equalCmdParam_P(3, PSTR("4")))
+	if (parser->equalCmdParam_P(1, PSTR("4")) || parser->equalCmdParam_P(2, PSTR("4")) || parser->equalCmdParam_P(3, PSTR("4")))
 	{
-		Serial.println(F("<< CMDClear: Sending screen 3"));
+		sent = true;
+		Serial.println(F("<< CMDSend: Sending screen 3"));
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress4, 3);
 	}
-	else
+	if (!sent)
 	{
-		Serial.println(F("<< CMDClear: Sending all screen"));
+		Serial.println(F("<< CMDSend: Sending all screen"));
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress1, 0);
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress2, 1);
 		ColorduinoController::Instance()->SendToClient(DestI2CAddress3, 2);
@@ -492,7 +500,7 @@ void ColorduinoController_CMDHelp(CmdParser* parser)
 {
 	Serial.println(F("<< CMDHelp: {Needed Args:Format} [Optional Args:Format] (Possible Action) (<Default Action>)"));
 	Serial.println(F("<< CMDHelp:		Note: ScreenAddress start at 0 and end at 3. ScreenAddressAtOne start to 1 and end at 4."));
-	//Serial.println(F("<< CMDHelp: PLAYMODE [Mode:byte]"));
+	Serial.println(F("<< CMDHelp: PLAYMODE [Mode:byte]"));
 	Serial.println(F("<< CMDHelp: PLAYMODE (FREEMODE, PLASMA (<SIN>, COS, TAN), FADE, LOADING, SOLIDCOLOR (RED, GREEN, BLUE, YELLOW, PURPLE, CYAN, <WHITE>, AZUR, ORANGE)"));
 	Serial.println(F("<< CMDHelp: SAVE (READ)"));
 	Serial.println(F("<< CMDHelp: BEEP ({Frequency:uint}, MUTE, UNMUTE, CRITICAL {Time:uint})"));
@@ -545,6 +553,7 @@ void ColorduinoController::Setup()
 	PlayMode = profile.PlayMode;
 	Buzzer->Muted = profile.IsMuted;
 	WaitForConsole = profile.WaitForConsole;
+	WaitForSending = profile.WaitForSending;
 
 	cmdCallback.addCmd(PSTR("PLAYMODE"), &ColorduinoController_CMDPlayMode);
 	cmdCallback.addCmd(PSTR("SAVE"), &ColorduinoController_CMDSave);
